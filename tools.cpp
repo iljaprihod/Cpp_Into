@@ -37,27 +37,56 @@ class MinecraftTool
 {
 public:
     string name;
+    float damageModifier; // Additional damage modifier
 
-    MinecraftTool(string n) : name(n) {}
+    MinecraftTool(string n, float dmgModifier = 1.0) : name(n), damageModifier(dmgModifier) {}
 
     void mine(Block &block)
     {
-        cout << name << " is mining " << block.name << "..." << endl;
-        block.apply_dmg(10);
+        int damageDealt;
+
+        // Applying damage based on the block type
+        if (block.name == "Stone")
+        {
+            damageDealt = static_cast<int>(10 * damageModifier * 2); // 2 times 
+        else
+        {
+            damageDealt = static_cast<int>(10 * damageModifier); // Normal damage 
+        }
+
+        cout << name << " mined " << block.name << " and dealt " << damageDealt << " damage." << endl;
+        block.apply_dmg(damageDealt);
+
         cout << "Remaining HP of " << block.name << ": " << block.get_hp() << endl;
     }
 
     void dig(Block &block)
     {
-        cout << name << " is digging " << block.name << "..." << endl;
-        block.apply_dmg(8);
+        int damageDealt;
+
+        // Applying damage based on the block type
+        if (block.name == "Dirt")
+        {
+            damageDealt = static_cast<int>(8 * damageModifier * 2); // 2 times
+        }
+        else
+        {
+            damageDealt = static_cast<int>(8 * damageModifier); // Normal damage 
+        }
+
+        cout << name << " dug " << block.name << " and dealt " << damageDealt << " damage." << endl;
+        block.apply_dmg(damageDealt);
+
         cout << "Remaining HP of " << block.name << ": " << block.get_hp() << endl;
     }
 
     void attack(Block &block)
     {
-        cout << name << " is attacking " << block.name << "..." << endl;
-        block.apply_dmg(15);
+        int damageDealt = static_cast<int>(15 * damageModifier); // Normal damage
+
+        cout << name << " attacked " << block.name << " and dealt " << damageDealt << " damage." << endl;
+        block.apply_dmg(damageDealt);
+
         cout << "Remaining HP of " << block.name << ": " << block.get_hp() << endl;
     }
 };
@@ -67,13 +96,13 @@ int main()
     Block dirt("Dirt", "Brown", 0.5, 10, 10, 10);
     Block stone("Stone", "Grey", 1.5, 10, 10, 10);
 
-    MinecraftTool pickaxe("Iron Pickaxe");
-    MinecraftTool shovel("Diamond Shovel");
+    MinecraftTool pickaxe("Iron Pickaxe", 2.0);  // 2 times damage 
+    MinecraftTool shovel("Diamond Shovel", 2.0); // 2 times damage
 
-    pickaxe.mine(dirt);
+    pickaxe.mine(stone);
     shovel.dig(dirt);
 
-    pickaxe.attack(stone);
+    pickaxe.attack(dirt);
     shovel.attack(stone);
 
     return 0;
