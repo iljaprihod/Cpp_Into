@@ -2,68 +2,78 @@
 #include <string>
 #include <vector>
 
-#include "main.cpp"
-
 using namespace std;
 
-
-class Item
-{
+class Item {
 public:
     string name;
     string description;
-
 };
 
-class Chest: public Block
-{
-bool lockStatus;
-vector<Item> content;
+class Block {
+public:
+    string name;
+    string texture;
+    float hardness;
+
+    Block(string name, string texture, float hardness)
+        : name(name), texture(texture), hardness(hardness) {}
+};
+
+class Chest : public Block {
+protected:
+    vector<Item> content;
+    bool lockStatus;
 
 public:
-    Chest():lockStatus(false),Block("Chest","Chest",0.5,1,1,1){}
+    Chest(string chestName) : lockStatus(false), Block(chestName, "Chest", 0.5) {}
 
-    void lock(){lockStatus = true;}
-    void unlock(){lockStatus = false;}
+    void lock() { lockStatus = true; }
+    void unlock() { lockStatus = false; }
 
-    void add_item(Item item){content.push_back(item);}
+    void add_item(Item item) { content.push_back(item); }
 
-    void show_content()
-    {
-        if(!lockStatus)
-        {
-            for(const Item& elem: content)
-            {
+    void show_content() {
+        if (!lockStatus) {
+            for (const Item &elem : content) {
                 cout << elem.name << endl;
             }
-        }
-        else
-        {
+        } else {
             cout << "Chest is locked" << endl;
         }
     }
-    
-
 };
 
-int main()
-{
-    Chest chest;
-    chest.show_content();
-    chest.add_item(Item{"Sword","A sword made of steel"});
-    chest.show_content();
-    chest.add_item(Item{"Shield","A shield made of steel"});
+class EnderChest : public Chest {
+private:
+    static vector<Item> sharedContent;
 
-    chest.show_content();
+public:
+    EnderChest(int chestNumber) : Chest("endchest" + to_string(chestNumber)) {}
 
-    chest.lock();
+    void add_item_shared(Item item) { sharedContent.push_back(item); }
 
-    chest.show_content();
+    void show_content_shared() {
+        cout << "Shared Ender Chest Content:" << endl;
+        for (const Item &elem : sharedContent) {
+            cout << elem.name << endl;
+        }
+    }
+};
 
-    chest.unlock();
+vector<Item> EnderChest::sharedContent; // Initializing the static member variable
 
-    chest.show_content();
+int main() {
+    vector<EnderChest> enderChests;
+
+    for (int i = 0; i < 3; ++i) {
+        enderChests.emplace_back(i);
+    }
+
+    enderChests[0].add_item_shared(Item{"Ender Pearl", "A mysterious ender pearl"});
+    enderChests[0].show_content_shared();
+
+    enderChests[1].show_content_shared(); // Content is shared among all Ender Chests
 
     return 0;
 }
-
